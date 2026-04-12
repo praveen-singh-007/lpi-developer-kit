@@ -1,41 +1,53 @@
-name: Validate Submission
+name: Validate & Process Submission
 
 on:
   pull_request:
     types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Detect submission level
         id: level
         run: |
-          FILES=$(git diff --name-only origin/main...HEAD 2>/dev/null || echo "")
+          FILES=$(git diff --name-only origin/master...HEAD 2>/dev/null || echo "")
 
+          LEVEL=""
           if echo "$FILES" | grep -q "^contributors/"; then
-            echo "level=1" >> $GITHUB_OUTPUT
+            LEVEL="1"
           fi
-          if echo "$FILES" | grep -q "^submissions/"; then
-            echo "level=2" >> $GITHUB_OUTPUT
+          if echo "$FILES" | grep -q "^submissions/.*level2"; then
+            LEVEL="2"
           fi
-          # Level 3 is a separate repo — linked in submissions/
+          if echo "$FILES" | grep -q "^submissions/.*level3"; then
+            LEVEL="3"
+          fi
+          echo "level=$LEVEL" >> $GITHUB_OUTPUT
 
       - name: Validate Level 1 — Contributor JSON
+        id: validate_l1
         if: steps.level.outputs.level == '1'
         run: |
-          for f in $(git diff --name-only origin/main...HEAD | grep "^contributors/" | grep ".json$"); do
+          VALID=true
+          for f in $(git diff --name-only origin/master...HEAD | grep "^contributors/" | grep ".json$" | grep -v TEMPLATE); do
             echo "Validating $f..."
 
-            # Check it's valid JSON
             if ! python3 -c "import json; json.load(open('$f'))"; then
               echo "::error::$f is not valid JSON"
-              exit 1
+              VALID=false
+              continue
             fi
 
-            # Check required fields
             python3 -c "
           import json, sys
           data = json.load(open('$f'))
@@ -50,29 +62,28 @@ jobs:
           if not isinstance(data['interests'], list):
               print('::error::interests must be a list')
               sys.exit(1)
-          if len(data['my_twin']) < 10:
-              print('::error::my_twin must be at least 10 characters')
+          if len(data['my_twin'].strip()) < 20:
+              print('::error::my_twin must be at least 20 characters — tell us something real')
               sys.exit(1)
-          print(f'$f is valid')
-          "
+          if data['name'] == 'Your Full Name' or data['github'] == 'your-github-username':
+              print('::error::Please fill in your actual details, not the template placeholders')
+              sys.exit(1)
+          print(f'VALID: {data[\"name\"]} ({data[\"github\"]})')
+          " || VALID=false
           done
+          echo "valid=$VALID" >> $GITHUB_OUTPUT
 
       - name: Label PR
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const files = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
-            const paths = files.data.map(f => f.filename);
+            const level = '${{ steps.level.outputs.level }}';
             const labels = [];
 
-            if (paths.some(p => p.startsWith('contributors/'))) labels.push('level-1');
-            if (paths.some(p => p.startsWith('submissions/'))) labels.push('level-2');
+            if (level === '1') labels.push('level-1');
+            if (level === '2') labels.push('level-2');
+            if (level === '3') labels.push('level-3');
 
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
@@ -82,3 +93,62 @@ jobs:
                 labels: labels,
               });
             }
+
+      - name: Auto-merge valid Level 1 PRs
+        if: steps.level.outputs.level == '1' && steps.validate_l1.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Approve the PR
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              event: 'APPROVE',
+              body: 'Welcome to the LifeAtlas Contributor Program! Your registration is valid. You are now part of the program. Proceed to Level 2 when ready.'
+            });
+
+            // Merge the PR
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              merge_method: 'squash',
+              commit_title: `contributor: ${context.payload.pull_request.title}`,
+            });
+
+      - name: Comment on invalid Level 1 PRs
+        if: steps.level.outputs.level == '1' && steps.validate_l1.outputs.valid == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Your submission has a validation error. Please check:\n\n- Is your JSON file valid? (no trailing commas, proper quotes)\n- Did you fill in ALL required fields? (name, github, program, campus, skills, interests, my_twin)\n- Is your \`my_twin\` answer at least 20 characters?\n- Did you replace the template placeholders with your actual details?\n\nFix the issues and push again — the check will re-run automatically.`
+            });
+
+      - name: Comment on Level 2 submissions
+        if: steps.level.outputs.level == '2'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Level 2 submission received. An agent will review your output shortly. In the meantime, consider starting Level 3 if you haven't already.`
+            });
+
+      - name: Comment on Level 3 submissions
+        if: steps.level.outputs.level == '3'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Level 3 submission received. An agent will clone your repo, attempt to run it, and evaluate your agent. You will receive a detailed review as a comment on this PR.`
+            });
