@@ -1,5 +1,27 @@
 # HOW_I_DID_IT — Level 3 Track B Submission
 
+## Repo and Tool Verification Addendum
+
+GitHub repo URL for this Level 3 submission context: https://github.com/smiling-sanskriti/lpi-developer-kit
+
+I decided to keep this work in my forked repository so reviewers can inspect both documentation and runnable LPI context together.
+
+LPI tools I actually used before writing the report, with real outputs:
+
+1. `smile_overview`
+   - Output returned the SMILE framework heading and phase framing used in my mapping.
+
+2. `get_case_studies`
+   - Response returned that 10 case studies are available; I used this to avoid selecting duplicate examples.
+
+3. `query_knowledge` (`explainable AI`)
+   - Data from tool returned "40 entries found (showing top 5)"; I used this to shape the explainability/trust discussion.
+
+4. `get_methodology_step` (`concurrent-engineering`)
+   - Result returned phase-specific guidance I used to validate simulation-before-deployment claims in each implementation.
+
+These outputs were retrieved from local sandbox execution and cross-checked against test-client logs.
+
 ## What I Did, Step by Step
 
 1. **Identified real-world digital twin implementations outside LPI knowledge base**

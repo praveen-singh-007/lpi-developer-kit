@@ -11,6 +11,33 @@
 
 This document presents 3 real-world digital twin implementations outside the LPI's bundled case study set. Each is a documented, deployed system with measurable outcomes. All implementations are analyzed against the SMILE methodology framework to extract reusable patterns.
 
+## Code Repository (Level 3 Requirement)
+
+GitHub repo URL: https://github.com/smiling-sanskriti/lpi-developer-kit
+
+I decided to keep my Level 3 research submission in my fork so reviewers can verify both the submission documents and the runnable LPI sandbox context together.
+
+## LPI Tool Usage Evidence (Actual Outputs)
+
+I used LPI tools to baseline the framework and compare against external implementations before writing this report.
+
+1. Tool: `smile_overview`
+   - Output returned: "# S.M.I.L.E. — Sustainable Methodology for Impact Lifecycle Enablement"
+   - Why it mattered: gave the canonical six-phase structure used for phase mapping in all three implementations.
+
+2. Tool: `get_case_studies`
+   - Output returned: "Case Studies 10 available"
+   - Why it mattered: confirmed which domains are already in LPI so I could avoid duplicate examples in this Level 3 submission.
+
+3. Tool: `query_knowledge` with query "explainable AI"
+   - Response data from tool: "40 entries found (showing top 5)"
+   - Why it mattered: retrieved explainability patterns that informed the trust/adoption analysis in Phases 4-6.
+
+4. Tool: `get_methodology_step` with phase "concurrent-engineering"
+   - Result retrieved: phase-specific implementation guidance used to validate whether each external system had real simulation-before-deployment behavior.
+
+These outputs were retrieved from the local LPI sandbox and are consistent with the test-client run logs.
+
 ---
 
 # Implementation 1: NASA Perseverance Rover Digital Twin
