@@ -1,44 +1,28 @@
-# How I Did It — Level 2 (Khushi Garg)
+# HOW I DID IT
 
-## Step 1: Cloned the Repository
-I cloned the LPI Developer Kit repository to my local machine using:
-git clone https://github.com/g-khushi/lpi-developer-kit.git
-cd lpi-developer-kit
+## Steps I followed
 
-## Step 2: Installed Dependencies
-I installed all required dependencies using:
-npm install
+1. Ran the LPI sandbox locally
+2. Used the provided agent.py as a base
+3. Installed Ollama and ran a local LLM
+4. Executed the agent with a test query
+5. Verified that multiple LPI tools were being called
+6. Observed how the LLM combined the results
 
-This step set up the project environment properly.
+## Problems I faced
 
-## Step 3: Built the Project
-I built the project using:
-npm run build
+- PowerShell blocked npm scripts initially
+- Ollama was not installed and caused connection errors
+- Missing Python dependencies like requests
 
-This ensured that all files were compiled successfully.
+## How I solved them
 
-## Step 4: Ran the Test Client
-I ran the test client using:
-npm run test-client
+- Changed execution policy in PowerShell
+- Installed Ollama and ran the server
+- Installed required Python packages
 
-The output showed that all tools were working correctly (all tests passed).
+## What I learned
 
-## Step 5: Setup Local AI Model
-I installed Ollama and used a local LLaMA3 model.
-
-- Installed Ollama
-- Ran the model locally
-- Used it to understand SMILE methodology and digital twin concepts
-
-## Step 6: Verified Output
-I verified that:
-- All tools executed successfully
-- The system produced valid outputs
-- The LPI environment was working correctly
-
-## Challenges Faced
-Initially, I faced an issue where Ollama was not recognized in the terminal.  
-I resolved it by restarting the terminal and ensuring proper installation.
-
-## Conclusion
-I successfully completed Level 2 by setting up the project locally, running all tools, and verifying the outputs using a local AI model.
+- How AI agents integrate multiple tools
+- Importance of combining structured data with LLMs
+- How explainability improves trust in AI systems
