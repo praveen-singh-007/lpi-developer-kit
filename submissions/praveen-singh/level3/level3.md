@@ -1,4 +1,3 @@
-## Repository
 https://github.com/praveen-singh-007/lpi-life-agent
 
 ### Evidence 1: Real Response from LPI Tools
