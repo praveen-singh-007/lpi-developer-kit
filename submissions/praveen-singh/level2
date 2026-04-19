@@ -1,0 +1,25 @@
+# Level 2 Submission — Praveen Singh
+
+## LPI Sandbox Setup
+All 7 tools passed successfully, confirming that the LPI sandbox is working as expected. Running the test-client felt like interacting with a modular system where each tool represents a specific capability of the agent. Instead of a single monolithic output, the system exposes structured functionality, which made it clear how agents can operate using tool calls rather than relying purely on raw LLM responses.
+
+---
+
+## Local LLM Setup (Ollama)
+
+**Model used:**  
+qwen2.5:1.5b  
+
+**Prompt:**  
+What is SMILE methodology?
+
+**Response (summary):**  
+The model described SMILE as a structured framework focused on managing and engineering the information lifecycle. It emphasized automating processes such as data creation, storage, access control, and deletion, along with benefits like improved compliance, reduced risk, and cost efficiency.
+
+**Observation:**  
+Running the model locally felt different from using cloud APIs because I had direct control over execution. It made the interaction feel more transparent and system-level rather than just querying an external service.
+
+---
+
+## Reflection on SMILE Methodology
+SMILE feels more like a systems engineering mindset rather than just a methodology. What stood out to me is its emphasis on designing systems that enforce behavior automatically instead of relying on manual rules or policies. This aligns with how scalable AI systems should work, where reliability comes from architecture rather than user discipline. It also connects well with the idea of digital twins, where continuous data tracking and lifecycle understanding are essential for meaningful insights. Overall, it shifts the focus from just building models to understanding how systems behave over time.
