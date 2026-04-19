@@ -3,12 +3,9 @@
 ## GitHub Repository
 
 https://github.com/g-khushi/lpi-agent-smile-advisor
-
-
 ## Overview
 
 I built an LPI Agent (SMILE Advisor) that connects to the LPI sandbox and uses multiple tools along with a local LLM (Ollama) to generate structured and explainable answers.
-
 
 ## What I Did
 
@@ -83,8 +80,6 @@ This proves that the response is grounded in actual tool outputs, not just LLM g
 npm run build
 python agent.py "your query"
 ```
-
-
 ## Tech Stack
 
 * Python
