@@ -3,6 +3,8 @@
 ## Project: Explainable Knowledge Agent (LPI)
 
 **Repository:** https://github.com/praveen-singh-007/lpi-life-agent
+**Code** https://github.com/praveen-singh-007/lpi-life-agent/agent.py
+**A2A Card**  https://github.com/praveen-singh-007/lpi-life-agent/agent.json
 
 ---
 
