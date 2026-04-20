@@ -2,90 +2,92 @@
 
 ## Project: Explainable Knowledge Agent (LPI)
 
-*Repository:* https://github.com/praveen-singh-007/lpi-life-agent
+**Repository:** https://github.com/praveen-singh-007/lpi-life-agent
 
 ---
 
-## Overview
+## What This Project Does
 
-This project implements a Level 3 agent using the Life Programmable Interface (LPI).
-The agent answers user queries by selecting and calling multiple tools, processing their outputs, and generating a structured response
-
----
-
-## Tools Used
-
-* `smile_overview` → provides SMILE methodology
-* `get_case_studies` → provides real-world implementations
+This is a Level 3 agent built on the Life Programmable Interface (LPI). Instead of just calling one tool, it picks multiple tools based on the user's question, runs them, processes their results, and then puts together a clean, structured answer.
 
 ---
 
-## How It Works
+## Tools Integrated
 
-1. Takes user input (e.g., healthcare-related query)
-2. Selects two relevant tools
-3. Sends JSON-RPC requests to LPI server
-4. Receives structured responses
-5. Parses and extracts relevant text
-6. Filters healthcare-specific case study
-7. Combines outputs into final answer
+- `smile_overview` → explains the SMILE methodology  
+- `get_case_studies` → fetches real-world implementation examples  
 
 ---
 
-## Key Features
+## Step-by-Step Workflow
 
-* Multi-tool orchestration
-* Dynamic argument handling for tools
-* JSON-RPC communication via subprocess
-* Structured output (summary + analysis + conclusion)
-* Domain-specific filtering (healthcare use case)
+1. Accepts a user question (e.g., something about healthcare)  
+2. Chooses two relevant tools to answer it  
+3. Sends JSON-RPC requests to the LPI server  
+4. Gets structured data back from each tool  
+5. Parses the responses and pulls out the useful text  
+6. Filters case studies to keep only healthcare-related ones  
+7. Merges everything into one final answer  
+
+---
+
+## Key Capabilities
+
+- Coordinates multiple tools in one flow  
+- Dynamically adjusts tool arguments as needed  
+- Uses JSON-RPC communication via subprocess calls  
+- Produces a structured final response (summary + analysis + conclusion)  
+- Filters results by domain (e.g., healthcare only)  
 
 ---
 
 ## Example Query
 
 ```text
-How are digital twins used in healthcare?
+How are digital twins being used in healthcare today?
 ```
-
----
 
 ## Example Output (Summary)
 
-* SMILE framework overview
-* Healthcare case study (continuous patient twin)
-* Analysis of methodology + application
+- Overview of the SMILE framework
 
----
+- A healthcare case study focused on continuous patient twinning
 
-## Level 3 Criteria Met
+- Analysis connecting the methodology to the actual application
 
-* ✔ Uses multiple tools
-* ✔ Combines outputs from different tools
-* ✔ Processes and structures responses
-* ✔ Produces a meaningful final answer
-* ✔ Demonstrates reasoning over tool outputs
+## Level 3 Requirements Met
+  ✅ Uses more than one tool
+  
+  ✅ Combines outputs from different tools
+  
+  ✅ Processes and restructures tool responses
+  
+  ✅ Delivers a meaningful, final answer
+  
+  ✅ Shows reasoning across tool outputs
 
----
+## Implementation Notes
+- Talks to the real LPI server (dist/src/index.js), not a mock client
 
-## Notes
+- Filters case studies to match the user's domain
 
-* Uses LPI server (`dist/src/index.js`), not test client
-* Filters case studies to match query context
-* Built using Python + Node.js (LPI)
+- Built with Python + Node.js (LPI runtime)
 
----
+## Going Beyond the Instructions
+**What I added on my own**
+- Filtered tool outputs to return only healthcare-relevant case studies instead of dumping everything.
 
-## Reflection (Beyond Instructions)
+- Modified tool arguments (e.g., used "healthcare digital twin") to make results more relevant instead of blindly passing the raw query.
 
-### What I did beyond the instructions
-- Filtered tool output to extract only healthcare-relevant case studies instead of returning full raw results.
-- Modified tool arguments (`"healthcare digital twin"`) to improve relevance instead of directly passing the user query.
-- Implemented manual parsing of nested JSON-RPC responses (`result → content → text`).
-- Used the actual LPI server (`dist/src/index.js`) instead of the test client, and handled initialization explicitly.
+- Manually parsed nested JSON-RPC responses (result → content → text).
 
-### What I would do differently next time
-- Abstract tool-calling logic into a reusable client instead of mixing it with agent logic.
-- Add clearer reasoning traces showing why tools were selected and how outputs were combined.
-- Improve summarization by structuring outputs (Challenge, Approach, Outcome) instead of truncation.
-- Make tool selection adaptive instead of rule-based.
+- Used the actual LPI server with explicit initialization instead of the test client.
+
+**What I'd improve next time**
+- Abstract the tool-calling logic into a reusable client separate from the agent logic.
+
+- Add explicit reasoning traces to show why each tool was chosen and how outputs were merged.
+
+- Improve summarization with consistent structure (Challenge → Approach → Outcome) instead of truncation.
+
+- Make tool selection adaptive rather than rule-based.
