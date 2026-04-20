@@ -7,13 +7,11 @@ https://github.com/amansharmabrb-maker/lpi-mission-agent
 Built a mission-style AI agent designed to simulate how real-world decision-support systems operate using the LPI toolkit. The agent takes a user query and transforms it into a structured “mission briefing” by combining knowledge retrieval, scenario-based insights, and actionable methodology steps.
 
 
-
 ## What the Agent Does
 - Accepts a user-defined problem or scenario  
 - Retrieves foundational knowledge using LPI tools  
 - Generates contextual insights based on the scenario  
-- Produces a step-by-step action plan using the SMILE methodology   
-- Outputs a structured, readable mission briefing  
+- Produces a step-by-step action plan using the SMILE methodology    
 
 ## Key Features
 - **Multi-tool integration**: Combines multiple LPI tools in a single workflow  
