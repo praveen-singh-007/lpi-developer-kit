@@ -1,161 +1,138 @@
-# HOW_I_DID_IT
+# How I Actually Built It
 
-## Overview
+## The Big Picture
 
-I built a Python-based agent that connects to the LPI (Life Programmable Interface) sandbox and answers questions by selecting and calling relevant tools. The agent uses multiple tools, processes their outputs, and generates a structured response.
-
----
-
-## Approach
-
-### 1. Understanding the LPI Setup
-
-* Explored the LPI Developer Kit to understand available tools.
-* Identified that tools are exposed via a Node.js server (`dist/src/index.js`), not the test client.
-* Learned that communication follows a JSON-RPC pattern.
+I wrote a Python agent that talks to the LPI (Life Programmable Interface) sandbox. It takes a question, figures out which tools to call, runs them, and stitches their answers together into something structured and useful.
 
 ---
 
-### 2. Building the Agent
+## My Step-by-Step Approach
 
-* Created a Python script (`agent.py`) to:
+### 1. Figuring Out the LPI Setup
 
-  * Accept user input
-  * Select relevant tools
-  * Call tools via subprocess (Node.js)
-  * Process and combine results
+- Spent some time exploring the LPI Developer Kit to see what tools were available.
+- Realized the tools aren't exposed through the test client — they run via a Node.js server at `dist/src/index.js`.
+- Noticed that all communication follows JSON-RPC patterns.
 
----
+### 2. Writing the Agent
 
-### 3. Tool Integration
+- Built a single Python script (`agent.py`) that handles:
+  - Reading user input
+  - Deciding which tools make sense
+  - Launching the Node server and calling tools via subprocess
+  - Mashing the results together
 
-* Used two tools:
+### 3. Connecting the Tools
 
-  * `smile_overview` → for methodology explanation
-  * `get_case_studies` → for real-world examples
+- Picked two tools to work with:
+  - `smile_overview` → explains the SMILE methodology
+  - `get_case_studies` → pulls real-world examples
+- Set up subprocess communication:
+  - Started the Node server with `subprocess.Popen`
+  - Sent JSON-RPC commands through stdin
+  - Read responses from stdout
 
-* Implemented subprocess communication:
+### 4. Fixing Protocol Headaches
 
-  * Started Node server using `subprocess.Popen`
-  * Sent JSON-RPC requests via stdin
-  * Received responses via stdout
+**What broke initially:**
+- I was calling `test-client.js` instead of the real server
+- Forgot to send the initialization message
 
----
-
-### 4. Handling Protocol Issues
-
-Initial attempts failed due to:
-
-* Using `test-client.js` instead of the actual server
-* Missing initialization step
-
-Fixes:
-
-* Switched to `dist/src/index.js`
-* Added:
-
+**How I fixed it:**
+- Switched to `dist/src/index.js`
+- Added this required handshake:
   ```json
-  {"jsonrpc": "2.0", "method": "notifications/initialized"}
+  {"jsonrpc": "2.0",
+          "method": "notifications/initialized"}
   ```
+## 5. Digging Into Nested Responses
+Tool outputs came back deeply nested:
 
----
-
-### 5. Parsing Tool Output
-
-* Tool responses returned nested JSON:
-
-  ```json
-  {
-    "result": {
-      "content": [
-        { "type": "text", "text": "..." }
-      ]
-    }
+```json
+{
+  "result": {
+    "content": [
+      { "type": "text", "text": "actual content here" }
+    ]
   }
-  ```
-* Extracted actual text using:
+}
+```
+So I had to extract with:
 
-  ```python
-  result["content"][0]["text"]
-  ```
+python
+result: ```["content"][0]["text"]```
 
----
+## 6. Making Results Actually Relevant
+The problem:
+get_case_studies returned examples from multiple industries — not just healthcare.
 
-### 6. Improving Relevance
+My fix:
+Changed the tool arguments to be more specific:
 
-Problem:
+python
+```{"query": "healthcare digital twin"}```
+Then manually filtered the response to pull only the healthcare-related parts.
 
-* Case studies returned multiple industries, not always healthcare.
+## 7. Assembling the Final Answer
 
-Fix:
+Kept summarization simple — trimmed text instead of splitting sentences (so headings didn't break)
 
-* Modified tool arguments:
+Combined three pieces:
 
-  ```python
-  {"query": "healthcare digital twin"}
-  ```
-* Extracted only the healthcare-related section from the response.
-
----
-
-### 7. Result Processing
-
-* Implemented simple summarization:
-
-  * Trimmed text instead of splitting sentences (to avoid broken headings)
-* Combined:
-
-  * SMILE methodology summary
-  * Healthcare case study
-  * Analysis + conclusion
+- SMILE methodology summary  
+- Healthcare case study  
+- Short analysis + conclusion  
 
 ---
 
-## Challenges Faced
+## What Went Wrong (And How I Fixed It)
 
-### 1. Incorrect Tool Execution
+### 1. Wrong Tool Executable
+**Issue:** Used `test-client.js` at first  
 
-* Initially used `test-client.js`
-* Result: only test logs, no usable data
+**Result:** Got test logs, no real data  
 
-### 2. Path and Environment Issues
-
-* Node process couldn’t find server files
-* Fixed using:
-
-  ```python
-  cwd="lpi-developer-kit"
-  ```
-
-### 3. Empty Outputs
-
-* Caused by incorrect JSON parsing and incomplete reads
-* Fixed using `process.communicate()` and proper parsing
-
-### 4. Irrelevant Case Study Results
-
-* Default tool output included multiple industries
-* Fixed by filtering healthcare-specific content
+**Fix:** Switched to the actual server file  
 
 ---
 
-## Key Learnings
+### 2. Path and Directory Problems
+**Issue:** Node process couldn't find server files  
 
-* Tool-based agents depend more on **data flow and integration** than model complexity
-* Correct environment setup is critical (paths, working directory, build)
-* Parsing structured responses properly is essential
-* Multi-tool orchestration improves answer quality significantly
-* Relevance filtering is necessary when tools return broad results
+**Fix:** Explicitly set working directory:
 
----
+```python
+cwd = "lpi-developer-kit"
+```
 
-## Final Outcome
+## 3. Empty Outputs
+**Issue:** Bad JSON parsing + incomplete stdout reads
 
-The agent:
+**Fix:** Used process.communicate() and proper response parsing
 
-* Uses multiple tools
-* Retrieves real data from LPI
-* Processes and filters results
-* Produces structured, relevant answers
+## 4. Irrelevant Case Studies
+**Issue:** Tool returned everything, not just what I asked for
 
----
+**Fix:** Added domain-specific filtering after receiving the response
+
+## What I Learned
+- For tool-based agents, data flow and integration matter more than model complexity
+
+- Getting the environment right (paths, working directory, build step) is half the battle
+
+- You have to parse structured responses carefully — no shortcuts
+
+- Using multiple tools dramatically improves answer quality
+
+- Tools often return broad results, so post-filtering is essential
+
+## Where I Ended Up
+The agent now:
+
+- Uses multiple tools in one flow
+
+- Pulls real data from the live LPI server
+
+- Processes and filters results intelligently
+
+- Outputs structured, relevant answers
