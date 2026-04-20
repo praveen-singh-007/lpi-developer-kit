@@ -33,7 +33,7 @@
   },
   "provider": {
     "organization": "Sanskriti",
-    "url": "https://github.com/sanskriti"
+    "url": "https://github.com/smiling-sanskriti/lpi-developer-kit"
   },
   "_lpiMetadata": {
     "lpiToolsUsed": ["smile_overview", "query_knowledge"],
