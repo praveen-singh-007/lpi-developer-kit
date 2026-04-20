@@ -165,6 +165,42 @@ Real-Time Patient Monitoring Digital Twin in ICU
 
 Project Details Developers: 2 Duration: 3 months Cloud Usage: No
 ```
+## Design Decisions & Independent Thinking
+
+**My Approach & Tool Selection Trade-offs:**
+
+Instead of building a simple explanation agent, I designed a **constraint-aware decision agent**. The key issue I observed was that LLMs tend to generate generic or over-ideal solutions.
+
+- *Trade-off:* I sacrificed flexibility in free-form outputs by enforcing a **strict structured response + grounding rules**. This ensured the agent produces **realistic, constraint-driven deployment strategies** instead of vague answers.
+
+---
+
+**Choices Made That Weren't In The Instructions:**
+
+1. **Constraint-first reasoning design**  
+   I made constraints (team size, timeline, infrastructure) the primary driver of decisions. This forces the agent to recommend **minimal viable solutions** rather than ideal architectures.
+
+2. **Relevance filtering for tool outputs**  
+   I added logic (via prompt rules) to ignore **cross-domain case studies**, preventing incorrect reasoning (e.g., energy systems applied to healthcare).
+
+3. **Hallucination control rules**  
+   I explicitly blocked:
+   - invented technologies  
+   - unsupported assumptions  
+   This improves reliability and keeps outputs grounded in tool data.
+
+4. **Expanded multi-tool reasoning (2 → 4 tools)**  
+   I included:
+   - `get_insights` for scenario reasoning  
+   - `query_knowledge` for context  
+   This improved decision quality compared to using only overview + case studies.
+
+---
+
+
+
+
+
 ## What I'd Do Differently
 
 The current system calls each tool using a new subprocess, which is simple but inefficient. A better design would:
